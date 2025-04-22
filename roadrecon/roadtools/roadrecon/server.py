@@ -294,17 +294,19 @@ def get_mfa():
     #     enabledusers.append(approle.principalId)
 
     # Filter out mailbox-only users by default
-    all_mfa = db.session.execute(select(User).where(
-        or_(User.cloudMSExchRecipientDisplayType is None,
-            and_(
-                User.cloudMSExchRecipientDisplayType != 0,
-                User.cloudMSExchRecipientDisplayType != 7,
-                User.cloudMSExchRecipientDisplayType != 18
-            )
-        )
-    ))
+    # all_mfa = db.session.execute(select(User).where(
+    #    or_(User.cloudMSExchRecipientDisplayType is None,
+    #        and_(
+    #            User.cloudMSExchRecipientDisplayType != 0,
+    #            User.cloudMSExchRecipientDisplayType != 7,
+    #            User.cloudMSExchRecipientDisplayType != 18
+    #        )
+    #    )
+    #))
+    
+    all_users = db.session.query(User).all()
     out = []
-    for user, in all_mfa: # pylint: disable=E1133
+    for user, in all_users: # pylint: disable=E1133
         mfa_methods = len(user.strongAuthenticationDetail['methods'])
         methods = [method['methodType'] for method in user.strongAuthenticationDetail['methods']]
         has_app = 'PhoneAppOTP' in methods or 'PhoneAppNotification' in methods
